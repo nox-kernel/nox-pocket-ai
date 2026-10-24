@@ -1,12 +1,12 @@
 # NOX Pocket AI
 
-**Private, portable, offline chat AI — built on a USB drive.** A free Windows starter project for the NOX Kernel video/workbench. Download this repository, run the installer **once while online**, and then use the model **offline** from the USB drive on a compatible Windows PC.
+**Private, portable, offline chat AI — built on a USB drive.** An experimental, free Windows starter project by NOX Kernel. Download this repository, run the installer **once while online**, and then use the model **offline** from the USB drive on a compatible Windows PC.
 
 **What it is:** A portable folder containing the llama.cpp Windows CPU runtime, a local Qwen3 1.7B quantised GGUF model and starter scripts. The AI **runs on the computer's CPU and RAM**, not inside the USB hardware. It does **not** run Windows from the USB or install an AI cloud service.
 
 **What it costs:** £0 in software or API fees. You provide the USB and Windows computer. No ChatGPT plan, login, API key, Python, CUDA or discrete GPU is required.
 
-> STATUS: Starter implementation. Scripts and documentation are published, but the full Windows download/USB/offline workflow has **not yet been end-to-end hardware tested**. Test before filming or presenting as a finished release. Record results in TEST-LOG.md.
+> **Project status: experimental preview.** The installation and offline workflow have not yet been confirmed through a complete physical Windows USB test. Compatibility may vary; see [TEST-LOG.md](TEST-LOG.md) for results and report reproducible issues.
 
 ## Quick start (Windows x64)
 
@@ -35,12 +35,12 @@ The **first setup needs internet**. After the downloads are complete and the dep
 
 Small models can hallucinate, are slower on older CPUs, and are not substitutes for large cloud models. The first answer may take some time.
 
-## Two files most viewers will use
+## Main launchers
 
 - **INSTALL-NOX-AI.bat** — initial online download and setup.
 - **START-NOX-AI.bat** — start offline chat after installation.
 
-Also included: **VERIFY-NOX-AI.bat**, **OPEN-LOCAL-CHAT.url**, a PowerShell implementation in tools/, a technical guide, recording plan and a test log.
+Also included: **VERIFY-NOX-AI.bat**, **OPEN-LOCAL-CHAT.url**, the PowerShell implementation under `tools/`, a technical guide, and a compatibility test log.
 
 ## Files and layout
 
@@ -52,13 +52,13 @@ nox-pocket-ai/
 ├── OPEN-LOCAL-CHAT.url
 ├── README.md
 ├── TECH-SHEET.md
-├── VIDEO-SCRIPT.md
-├── TEST-LOG.md
+├── VIDEO-SCRIPT.md        <- project production reference
+├── TEST-LOG.md            <- compatibility checks
 ├── SOURCES-AND-LICENSES.md
 ├── bin/                  <- llama.cpp executable + required DLLs (downloaded)
 ├── models/               <- Qwen GGUF (downloaded)
 ├── tools/                <- installer, launcher, verifier, local manifest
-└── recording/            <- video production notes
+└── recording/            <- project production resources
 ~~~
 
 The USB drive letter may change between computers; scripts use their own folder location instead of a hardcoded drive letter. Do not move the BAT files out of the project folder.
@@ -72,17 +72,13 @@ The USB drive letter may change between computers; scripts use their own folder 
 - Qwen3 can emit internal reasoning/thinking text; the built-in UI usually displays it separately.
 - Running on a second computer requires a compatible Windows x64 CPU and any necessary system runtime libraries. Model speed depends on the host; the USB does not provide compute.
 
-## For the video and viewers
+## Optional AI-guided setup
 
-Start with **VIDEO-SCRIPT.md** for the shot list, voiceover, video outline, titles and description. Use **TEST-LOG.md** to record a genuine offline test before claiming the setup works.
-
-### Optional ChatGPT setup prompt for viewers
-
-No paid plan or artifact-generation tools are needed to use this repository. If you want ChatGPT to guide you:
+You can follow the guide without any AI subscription. For optional help from ChatGPT or another assistant, use this prompt:
 
 > I downloaded the NOX Pocket AI repository and extracted it to a USB drive. I'm using a Windows x64 PC. Walk me through TECH-SHEET.md one action at a time. Don't ask me for API keys, don't recommend a paid service, and don't assume a cloud connection after installation. Help me confirm the llama.cpp executable, GGUF model, localhost chat interface, and then an offline test. If something fails, explain the error and give one safe diagnostic step before any destructive action.
 
-The GitHub repository is the **canonical download** regardless of the viewer's ChatGPT plan.
+The repository and its scripts work independently of the assistant used to read the instructions.
 
 ## Troubleshooting and contributing
 
