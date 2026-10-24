@@ -110,7 +110,7 @@ The scripted launcher supplies an absolute model path so it works when the USB d
 | Chat doesn't open offline | Ensure both the runtime EXE/DLLs and model GGUF exist on the USB. A model card URL isn't the model file. |
 | GitHub ZIP download doesn't contain model | Correct by design. Run the installer once online; large third-party binary files are not redistributed in Git. |
 
-## Maintainer checks before publishing a video
+## Compatibility validation checklist
 
 - [ ] Clean Windows 10/11 x64 setup succeeds from a fresh ZIP.
 - [ ] Installer finds an actual CPU x64 release and copies the necessary DLLs.
