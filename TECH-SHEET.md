@@ -89,10 +89,9 @@ The scripted launcher supplies an absolute model path so it works when the USB d
 2. Close the server window.
 3. Disconnect Wi-Fi, unplug Ethernet, and ensure any VPN or tethering is inactive.
 4. Start **START-NOX-AI.bat** again, open the local URL, and ask a fresh question.
-5. Capture the working chat and Windows network-disconnected indicator on video.
-6. If possible, safely stop the server, move the USB to a *second* compatible Windows PC and repeat steps 4–5.
+5. If possible, safely stop the server, move the USB to a *second* compatible Windows PC, and repeat the offline launch to confirm portability.
 
-**Truth in advertising:** You only need the internet during setup. A USB flash drive does not perform inference; the PC supplies CPU, RAM and power.
+**How it works:** Internet access is needed for the initial downloads. The USB stores the AI files; the PC supplies CPU, RAM and power for local inference.
 
 ## Troubleshooting
 
@@ -110,16 +109,13 @@ The scripted launcher supplies an absolute model path so it works when the USB d
 | Chat doesn't open offline | Ensure both the runtime EXE/DLLs and model GGUF exist on the USB. A model card URL isn't the model file. |
 | GitHub ZIP download doesn't contain model | Correct by design. Run the installer once online; large third-party binary files are not redistributed in Git. |
 
-## Compatibility validation checklist
+## Final setup checks
 
-- [ ] Clean Windows 10/11 x64 setup succeeds from a fresh ZIP.
-- [ ] Installer finds an actual CPU x64 release and copies the necessary DLLs.
-- [ ] Qwen3 model downloads completely and verifies.
-- [ ] A normal double-click launch opens the built-in chat UI.
-- [ ] A useful example prompt responds with the network disconnected.
-- [ ] Test on a second PC with a different drive letter and no installed development tools.
-- [ ] No Windows firewall rule, cloud API, admin access, or system-wide policy change is needed.
-- [ ] Record version/build, CPU, RAM, USB type, date and any limitations in TEST-LOG.md.
+- [ ] The downloaded `llama-server.exe` and GGUF model are both present on the USB.
+- [ ] `VERIFY-NOX-AI.bat` reports no errors.
+- [ ] `START-NOX-AI.bat` opens the local chat interface at http://127.0.0.1:8080.
+- [ ] The model responds to a question while the computer is offline.
+- [ ] The server is stopped before safely ejecting the USB.
 
 ## Upstream documentation
 

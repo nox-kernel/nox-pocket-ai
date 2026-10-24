@@ -6,7 +6,7 @@
 
 **What it costs:** £0 in software or API fees. You provide the USB and Windows computer. No ChatGPT plan, login, API key, Python, CUDA or discrete GPU is required.
 
-> **Project status: experimental preview.** The installation and offline workflow have not yet been confirmed through a complete physical Windows USB test. Compatibility may vary; see [TEST-LOG.md](TEST-LOG.md) for results and report reproducible issues.
+> **Project status: experimental preview.** The complete installation and offline workflow has not yet been validated on physical Windows hardware. Check the setup requirements and run the verification steps on your own PC.
 
 ## Quick start (Windows x64)
 
@@ -40,7 +40,7 @@ Small models can hallucinate, are slower on older CPUs, and are not substitutes 
 - **INSTALL-NOX-AI.bat** — initial online download and setup.
 - **START-NOX-AI.bat** — start offline chat after installation.
 
-Also included: **VERIFY-NOX-AI.bat**, **OPEN-LOCAL-CHAT.url**, the PowerShell implementation under `tools/`, a technical guide, and a compatibility test log.
+Also included: **VERIFY-NOX-AI.bat**, **OPEN-LOCAL-CHAT.url**, the PowerShell scripts under `tools/`, and a detailed setup and troubleshooting guide in **TECH-SHEET.md**.
 
 ## Files and layout
 
@@ -52,13 +52,10 @@ nox-pocket-ai/
 ├── OPEN-LOCAL-CHAT.url
 ├── README.md
 ├── TECH-SHEET.md
-├── VIDEO-SCRIPT.md        <- project production reference
-├── TEST-LOG.md            <- compatibility checks
 ├── SOURCES-AND-LICENSES.md
 ├── bin/                  <- llama.cpp executable + required DLLs (downloaded)
 ├── models/               <- Qwen GGUF (downloaded)
-├── tools/                <- installer, launcher, verifier, local manifest
-└── recording/            <- project production resources
+└── tools/                <- installer, launcher, verifier, local manifest
 ~~~
 
 The USB drive letter may change between computers; scripts use their own folder location instead of a hardcoded drive letter. Do not move the BAT files out of the project folder.
