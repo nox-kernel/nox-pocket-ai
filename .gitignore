@@ -1,0 +1,17 @@
+# Downloaded binaries and models stay on the user's USB, never in Git
+bin/*
+!bin/.gitkeep
+models/*
+!models/.gitkeep
+recording/*
+!recording/README.md
+tools/.cache/
+tools/.tmp/
+tools/download-manifest.json
+*.gguf
+*.gguf.part
+*.zip.part
+*.exe
+*.dll
+.DS_Store
+Thumbs.db
