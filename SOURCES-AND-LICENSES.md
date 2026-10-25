@@ -8,19 +8,18 @@ NOX Pocket AI is a **small integration project**. The repository supplies script
 | llama.cpp inference server | https://github.com/ggml-org/llama.cpp | MIT; inspect current upstream LICENSE |
 | Windows binary releases | https://github.com/ggml-org/llama.cpp/releases | Official builds; may bundle libraries with their own notices |
 | Qwen3-1.7B base model | https://huggingface.co/Qwen/Qwen3-1.7B | Apache 2.0 |
-| Qwen3-1.7B-GGUF quantisation | https://huggingface.co/unsloth/Qwen3-1.7B-GGUF | Listed Apache 2.0; check model card and files |
+| Qwen3-1.7B-GGUF quantisation | https://huggingface.co/ggml-org/Qwen3-1.7B-GGUF | Listed Apache 2.0; check model card and files |
 | Microsoft PowerShell / Windows | Microsoft | Provided by the user's Windows installation |
 
 ## Download destinations used by the installer
 
-- Runtime release metadata: https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=100
-- Runtime archive: the selected release's browser_download_url, with a win-cpu-x64 ZIP filename.
-- Model metadata: https://huggingface.co/api/models/unsloth/Qwen3-1.7B-GGUF/tree/main
-- Model binary: https://huggingface.co/unsloth/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf
+- Runtime archive: https://github.com/ggml-org/llama.cpp/releases/download/b11809/llama-b11809-bin-win-cpu-x64.zip
+- Model binary: https://huggingface.co/ggml-org/Qwen3-1.7B-GGUF/resolve/daeb8e2d528a760970442092f6bf1e55c3b659eb/Qwen3-1.7B-Q4_K_M.gguf?download=true
+- Exact versions, file sizes, hashes and runtime file checksums: **tools/asset-manifest.json**. Runtime file hashes were derived from the archive whose SHA-256 matches the GitHub release digest; the model SHA-256 matches the publisher's Git LFS object.
 
 ## Integrity and security
 
-The installer checks publisher metadata and available SHA-256 digests for downloads. If a publisher does not expose a digest, it records its *own* SHA-256 for later integrity checks, but such a locally computed hash **is not equivalent to publisher authenticity verification**. TLS/download origin and review of scripts still matter.
+The installer requires the checked-in SHA-256 values for both downloads; a mismatch stops installation. The offline verifier checks all packaged runtime files and the model against this pinned manifest. The install receipt records what was installed and is not the trust source. TLS/download origin and review of scripts still matter.
 
 The project does not request API keys and the server binds to 127.0.0.1. Don't publish personal model chats, account tokens or a server reachable from the internet.
 

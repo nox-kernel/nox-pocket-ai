@@ -1,85 +1,51 @@
-# NOX Pocket AI - fully offline local file checks (not a substitute for live inference)
+# Offline, read-only checks against the pinned runtime and model.
+[CmdletBinding()]
+param([string]$Root = '')
 $ErrorActionPreference = 'Stop'
-$root = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
-$exe = Join-Path $root 'bin\llama-server.exe'
-$model = Join-Path $root 'models\Qwen3-1.7B-Q4_K_M.gguf'
-$manifestPath = Join-Path $PSScriptRoot 'download-manifest.json'
+if (-not $Root) { $Root = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..')) }
+$assets = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'asset-manifest.json') -Raw | ConvertFrom-Json
 $failures = 0
-
 function Pass([string]$message) { Write-Host ('[PASS] ' + $message) -ForegroundColor Green }
 function Fail([string]$message) { Write-Host ('[FAIL] ' + $message) -ForegroundColor Red; $script:failures += 1 }
 function Note([string]$message) { Write-Host ('[INFO] ' + $message) -ForegroundColor Cyan }
 
 try {
-    Note ('Project path: ' + $root)
-    if ($env:OS -ne 'Windows_NT' -or -not [Environment]::Is64BitOperatingSystem -or [IntPtr]::Size -ne 8) {
+    $Root = [IO.Path]::GetFullPath($Root)
+    Note ('Project path: ' + $Root)
+    if ($env:OS -ne 'Windows_NT' -or -not [Environment]::Is64BitOperatingSystem -or [IntPtr]::Size -ne 8 -or $env:PROCESSOR_ARCHITECTURE -ne 'AMD64') {
         Fail 'This kit requires Windows x64.'
-    } else {
-        Pass 'Windows x64 runtime environment.'
-    }
-    try {
-        $ramBytes = [long](Get-CimInstance -ClassName Win32_ComputerSystem).TotalPhysicalMemory
-        $ramGiB = [math]::Round(($ramBytes / 1GB), 1)
-        Note ("Host RAM: $ramGiB GiB (8 GiB+ recommended)")
-    } catch {
-        Note 'Could not query host RAM.'
-    }
+    } else { Pass 'Windows x64 runtime environment.' }
 
-    if (-not (Test-Path -LiteralPath $exe)) {
-        Fail 'llama-server.exe missing. Run INSTALL-NOX-AI.bat while online.'
-    } elseif ((Get-Item -LiteralPath $exe).Length -lt 100KB) {
-        Fail 'llama-server.exe looks unexpectedly small.'
-    } else {
-        Pass 'llama-server.exe is present.'
-    }
-
-    if (-not (Test-Path -LiteralPath $model)) {
-        Fail 'Qwen3 GGUF missing. Run INSTALL-NOX-AI.bat while online.'
-    } elseif ((Get-Item -LiteralPath $model).Length -lt 300MB) {
-        Fail 'Model file is implausibly small/incomplete.'
-    } else {
-        $stream = [System.IO.File]::OpenRead($model)
-        try {
-            $buffer = New-Object byte[] 4
-            [void]$stream.Read($buffer, 0, 4)
-            if ([System.Text.Encoding]::ASCII.GetString($buffer) -ne 'GGUF') {
-                Fail 'Model header is not GGUF.'
-            } else {
-                Pass ('GGUF model present (' + [math]::Round(((Get-Item $model).Length / 1GB), 2) + ' GiB).')
-            }
-        } finally {
-            $stream.Dispose()
+    Note ('Checking llama.cpp ' + $assets.runtime.tag + ' runtime files and DLLs...')
+    $runtimeFailures = $failures
+    foreach ($file in $assets.runtime.files.PSObject.Properties) {
+        $path = Join-Path (Join-Path $Root 'bin') $file.Name
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+            Fail ('Missing runtime file: ' + $file.Name)
+        } elseif ((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $file.Value) {
+            Fail ('Runtime SHA-256 mismatch: ' + $file.Name)
         }
     }
+    # b11809 has a small EXE plus implementation DLLs; EXE size alone is not a validity check.
+    if ($failures -eq $runtimeFailures) { Pass 'All pinned runtime files match, including the server EXE and its DLLs.' }
 
-    if (Test-Path -LiteralPath $manifestPath) {
-        try {
-            $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
-            Note ('Installed runtime version: ' + [string]$manifest.runtime_tag)
-            if (Test-Path -LiteralPath $model) {
-                $currentHash = (Get-FileHash -LiteralPath $model -Algorithm SHA256).Hash.ToLowerInvariant()
-                if ($currentHash -eq [string]$manifest.model_sha256) {
-                    Pass 'Local GGUF SHA-256 matches the install manifest.'
-                } else {
-                    Fail 'GGUF SHA-256 does not match the install manifest; re-download before using.'
-                }
-            }
-            if (-not [bool]$manifest.model_publisher_digest_verified) {
-                Note 'The install manifest does not record a publisher-verified GGUF digest; local integrity only.'
-            }
-        } catch {
-            Fail ('Could not read manifest / verify hash: ' + $_.Exception.Message)
-        }
+    $model = Join-Path (Join-Path $Root 'models') $assets.model.filename
+    if (-not (Test-Path -LiteralPath $model -PathType Leaf)) {
+        Fail 'GGUF model missing. Run INSTALL-NOX-AI.bat while online.'
+    } elseif ((Get-Item -LiteralPath $model).Length -ne [long]$assets.model.size_bytes) {
+        Fail 'Model size does not match the pinned GGUF.'
     } else {
-        Note 'No download-manifest.json yet; reinstall online to create a local verification record.'
+        Note 'Reading the 1.28 GB model for its SHA-256 check; this can take a moment...'
+        if ((Get-FileHash -LiteralPath $model -Algorithm SHA256).Hash.ToLowerInvariant() -eq $assets.model.sha256) {
+            Pass 'GGUF SHA-256 matches the pinned publisher value.'
+        } else { Fail 'GGUF SHA-256 mismatch. Keep this folder as a backup and install a fresh copy.' }
     }
-
     Write-Host ''
     if ($failures -gt 0) {
-        Write-Host ("Verification found $failures problem(s).") -ForegroundColor Red
+        Write-Host ("Verification found $failures problem(s). See TECH-SHEET.md.") -ForegroundColor Red
         exit 1
     }
-    Pass 'Local file checks completed. Now do a real chat + offline network test.'
+    Pass 'Local file checks completed. Start the chat next; offline operation needs a separate real test.'
     exit 0
 } catch {
     Write-Host ('[ERROR] ' + $_.Exception.Message) -ForegroundColor Red
